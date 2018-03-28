@@ -1,0 +1,27 @@
+[[source]]
+url = "https://mirrors.aliyun.com/pypi/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+pylint = "*"
+pytest = "*"
+"autopep8" = "*"
+rope = "*"
+pyside = "*"
+
+[packages]
+"544be00" = {file = "https://github.com/WuLiFang/wlf/archive/0.3.3.tar.gz"}
+"pathlib2" = ">=2.3.0"
+gevent = ">=1.2.2"
+openpyxl = ">=2.5.1"
+psutil = ">=5.4.3"
+"beautifulsoup4" = ">=4.6.0"
+"Qt.py" = ">=1.1.0"
+pyblish = ">=1.4.3"
+requests = "*"
+websocket-client = "*"
+"1db2020" = {file = "https://github.com/WuLiFang/cgtwq/archive/1.0.2.tar.gz"}
+
+[requires]
+python_version = "2.7"
