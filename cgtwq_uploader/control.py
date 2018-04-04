@@ -22,8 +22,9 @@ class ShotsFileDirectory(QObject):
 
     pipeline_ext = {
         '灯光': ('.jpg', '.png', '.jpeg'),
-        '渲染': ('.mov'),
-        '合成': ('.mov'),
+        '渲染': ('.mov',),
+        '合成': ('.mov',),
+        '输出': ('.mov',)
     }
     dest_dict = None
     changed = Signal()

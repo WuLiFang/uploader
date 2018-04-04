@@ -48,6 +48,11 @@
            <string>合成</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>输出</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
