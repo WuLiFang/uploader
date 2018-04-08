@@ -21,6 +21,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QLabel" name="version_label">
+     <property name="text">
+      <string>version</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -214,7 +224,11 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QListWidget" name="listWidget"/>
+      <widget class="QListView" name="listView">
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -292,14 +306,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="version_label">
-     <property name="text">
-      <string>version</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
+    <widget class="QStatusBar" name="statusBar"/>
    </item>
   </layout>
   <action name="actionSync">
@@ -347,10 +354,11 @@
     <string>reset</string>
    </property>
   </action>
+  <zorder>statusBar</zorder>
   <zorder>tabWidget</zorder>
   <zorder>syncButton</zorder>
-  <zorder>version_label</zorder>
   <zorder></zorder>
+  <zorder>version_label</zorder>
  </widget>
  <resources/>
  <connections>
