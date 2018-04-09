@@ -6,11 +6,13 @@ from __future__ import (absolute_import, division, print_function,
 
 import cgtwq
 from wlf.uitools import main_show_dialog
+from wlf import mp_logging
 
-from .window import Dialog
+from .view import Dialog
 
 
 def main():
+    mp_logging.basic_config()
     cgtwq.update_setting()
     main_show_dialog(Dialog)
 

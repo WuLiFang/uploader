@@ -9,17 +9,15 @@ import os
 import webbrowser
 from multiprocessing.dummy import Pool
 
-from Qt.QtCore import (QCoreApplication, QModelIndex, QObject, Qt, QTimer,
-                       Signal, Slot)
+from Qt.QtCore import QCoreApplication, QModelIndex, QObject, Qt, Signal
 from Qt.QtGui import QBrush, QColor
-from six import text_type
 from six.moves import range
 
 import cgtwq
 from wlf import mp_logging
 from wlf.decorators import run_async
 from wlf.env import has_nuke
-from wlf.files import copy, is_same, version_filter
+from wlf.files import copy, is_same
 from wlf.notify import CancelledError, progress
 from wlf.path import PurePath
 
@@ -34,6 +32,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Controller(QObject):
     """Controller for uploader.  """
+
     root_changed = Signal(str)
     upload_finished = Signal()
     pipeline = '合成'
@@ -84,6 +83,14 @@ class Controller(QObject):
         self.root_changed.emit(value)
 
     def open_index(self, index, is_use_burnin=True):
+        """Open item in browser
+
+        Args:
+            index (Qt.QtCore.QModelIndex): Item index.
+            is_use_burnin (bool, optional): Defaults to True.
+                If use the burn-in version.
+        """
+
         data = self.model.data(index)
         filename = self.model.absolute_path(data)
         webbrowser.open(filename)
@@ -94,6 +101,15 @@ class Controller(QObject):
                         else filename)
 
     def source_index(self, path):
+        """Get source model index from path.
+
+        Args:
+            path (str): Path data.
+
+        Returns:
+            Qt.QtCore.ModelIndex: Index in source model.
+        """
+
         model = self.model
         source_model = model.sourceModel()
         return model.mapFromSource(source_model.index(path))
@@ -231,6 +247,8 @@ class Controller(QObject):
         _run()
 
     def reverse_selection(self):
+        """Reverse current selection.  """
+
         model = self.model
         for i in model.indexes():
             state = model.data(i, Qt.CheckStateRole)
@@ -243,6 +261,8 @@ class Controller(QObject):
                               Qt.CheckStateRole)
 
     def select_all(self):
+        """Select all local item.  """
+
         model = self.model
         for i in model.indexes():
             if model.data(i, Qt.ForegroundRole) == self.brushes['local']:
@@ -250,6 +270,3 @@ class Controller(QObject):
             else:
                 model.setData(i, Qt.Unchecked,
                               Qt.CheckStateRole)
-
-
-mp_logging.basic_config(level='DEBUG')

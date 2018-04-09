@@ -119,6 +119,8 @@ class VersionFilterProxyModel(QSortFilterProxyModel):
         return source_model.isDir(source_index)
 
     def indexes(self):
+        """Return all indexes under root.  """
+
         root_index = self.root_index()
         count = self.rowCount(root_index)
         return (self.index(i, 0, root_index) for i in range(count))
