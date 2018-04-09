@@ -78,6 +78,8 @@ class Dialog(DialogWithDir):
 
         # Signals
         self.actionDir.triggered.connect(self.ask_dir)
+        self.listView.clicked.connect(self.on_view_item_clicked)
+        self.listView.doubleClicked.connect(self.on_view_item_double_clicked)
         # self.actionSync.triggered.connect(self.upload)
         # self.actionServer.triggered.connect(self.ask_server)
         self.actionOpenDir.triggered.connect(
@@ -87,7 +89,14 @@ class Dialog(DialogWithDir):
         self.upload_finished.connect(self.activateWindow)
 
     def on_root_changed(self, value):
+        self.dirEdit.setText(value)
         self.listView.setRootIndex(self.controller.source_index(value))
+
+    def on_view_item_clicked(self, index):
+        self.controller.change_root(index)
+
+    def on_view_item_double_clicked(self, index):
+        self.controller.open_index(index, self.checkBoxBurnIn.checkState())
 
     def event(self, event):
         """Override.  """

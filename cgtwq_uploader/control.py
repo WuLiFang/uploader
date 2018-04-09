@@ -8,23 +8,28 @@ import os
 from collections import namedtuple
 from multiprocessing.dummy import Pool
 
-from Qt.QtCore import QCoreApplication, QObject, Qt, QTimer, Signal
+from Qt.QtCore import (QCoreApplication, QModelIndex, QObject, Qt, QTimer,
+                       Signal)
+from Qt.QtGui import QBrush, QColor
 from six import text_type
 from six.moves import range
 
 import cgtwq
 from wlf import mp_logging
-from wlf.decorators import run_async
+from wlf.env import has_nuke
 from wlf.files import is_same, version_filter
 from wlf.notify import CancelledError, progress
 from wlf.path import PurePath
 
 from .__about__ import __version__
+from .cgtwq_helper import CGTWQHelper
+from .exceptions import DatabaseError
 #         ret = self.dest_dict.get(PurePath(filename).shot, self.dest)
 #         if isinstance(ret, (str, unicode)):
 #             ret = str(PurePath(ret) / PurePath(filename).as_no_version())
 #         return ret
-from .model import ROLE_DEST, VersionFilterProxyModel, ROLE_CHECKABLE
+from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
+                    VersionFilterProxyModel)
 from .util import LOGGER
 
 # class ShotsFileDirectory(QObject):
@@ -190,16 +195,16 @@ from .util import LOGGER
 
 #     def get_dest(self, filename):
 #         """Get cgteamwork upload destination for @filename.  """
-from Qt.QtGui import QBrush, QColor
 
-from wlf.env import has_nuke
-from .model import DirectoryModel, VersionFilterProxyModel
+LOGGER = logging.getLogger(__name__)
+import webbrowser
 
 
 class Controller(QObject):
     """Controller for uploader.  """
     root_changed = Signal(str)
     pipeline = '合成'
+    burnin_folder = 'burn-in'
     if has_nuke():
         brushes = {'local': QBrush(QColor(200, 200, 200)),
                    'uploaded': QBrush(QColor(100, 100, 100)),
@@ -228,8 +233,28 @@ class Controller(QObject):
         self.update_model()
 
     def change_root(self, value):
+        """Change uploader root.  """
+
+        if isinstance(value, QModelIndex):
+            if not self.model.is_dir(value):
+                return
+            data = self.model.data(value)
+            value = self.model.absolute_path(data)
+
+        value = os.path.normpath(value)
         self.model.sourceModel().setRootPath(value)
+        LOGGER.debug('Change root: %s', value)
         self.root_changed.emit(value)
+
+    def open_index(self, index, is_use_burnin=True):
+        data = self.model.data(index)
+        filename = self.model.absolute_path(data)
+        webbrowser.open(filename)
+        burn_in_path = self.model.absolute_path(self.burnin_folder, data)
+
+        webbrowser.open(burn_in_path
+                        if is_use_burnin and os.path.exists(burn_in_path)
+                        else filename)
 
     def source_index(self, path):
         model = self.model
@@ -243,41 +268,28 @@ class Controller(QObject):
 
         model = self.model
         root_index = model.root_index()
-        project_data = cgtwq.PROJECT.all().get_fields('code', 'database')
         cgtwq.update_setting()
         current_id = cgtwq.current_account_id()
 
-        def _get_database(filename):
-            for i in project_data:
-                code, database = i
-                if text_type(filename).startswith(code):
-                    return database
-            raise ValueError('Can not determinate database from filename.')
-
         def _do(i):
             index = model.index(i, 0, root_index)
+            if self.model.is_dir(index):
+                model.setData(index, False, ROLE_CHECKABLE)
+                model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
+                return
             filename = model.data(index)
             try:
                 try:
-                    database = _get_database(filename)
-                except ValueError:
+                    entry = CGTWQHelper.get_entry(filename, self.pipeline)
+                except DatabaseError:
                     model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
                     model.setData(index, '找不到对应数据库', Qt.ToolTipRole)
                     return
+                assert isinstance(entry, cgtwq.Entry), type(entry)
                 shot = PurePath(filename).shot
-                module = cgtwq.Database(database)['shot_task']
-                select = module.filter(
-                    (cgtwq.Field('pipeline') == self.pipeline)
-                    & (cgtwq.Field('shot.shot') == shot)
-                )
-                try:
-                    entry = select.to_entry()
-                except ValueError:
-                    # TODO
-                    entry = select.to_entries()[0]
-
-                dest = (PurePath(entry.filebox.get_submit().path) /
-                        PurePath(shot).with_suffix(PurePath(filename).suffix)).as_posix()
+                dest = (model.data(index, ROLE_DEST)
+                        or (PurePath(entry.filebox.get_submit().path) /
+                            PurePath(shot).with_suffix(PurePath(filename).suffix)).as_posix())
 
                 # Set dest.
                 model.setData(index, dest, ROLE_DEST)
@@ -285,7 +297,8 @@ class Controller(QObject):
                 # Set tooltip.
                 model.setData(index,
                               '<br>'.join([
-                                  '数据库: {0}'.format(database),
+                                  '数据库: {0}'.format(
+                                      entry.module.database.name),
                                   '镜头: {0}'.format(shot),
                                   '目的地: {0}'.format(dest)
                               ]),

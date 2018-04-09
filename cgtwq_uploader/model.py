@@ -19,7 +19,7 @@ class DirectoryModel(QFileSystemModel):
 
     def __init__(self, parent=None):
         super(DirectoryModel, self).__init__(parent)
-        self.setFilter(QDir.NoDotAndDotDot | QDir.Files)
+        self.setFilter(QDir.NoDot | QDir.Files | QDir.Dirs)
         self.columns = {
             Qt.CheckStateRole: {},
             Qt.ToolTipRole: {},
@@ -103,3 +103,18 @@ class VersionFilterProxyModel(QSortFilterProxyModel):
 
         model = self.sourceModel()
         return self.mapFromSource(model.index(model.rootPath()))
+
+    def absolute_path(self, *path):
+        """Convert path to absolute path.  """
+        model = self.sourceModel()
+        return os.path.join(model.rootPath(), *path)
+
+    def is_dir(self, index):
+        """Wrapper for `self.sourceModel().isDir`.  """
+
+        source_index = self.mapToSource(index)
+        source_model = self.sourceModel()
+        return source_model.isDir(source_index)
+
+
+import os
