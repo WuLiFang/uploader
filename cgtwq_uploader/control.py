@@ -9,7 +9,7 @@ import os
 import webbrowser
 from multiprocessing.dummy import Pool
 
-from Qt.QtCore import QCoreApplication, QModelIndex, QObject, Qt, Signal
+from Qt.QtCore import QModelIndex, QObject, Qt, Signal
 from Qt.QtGui import QBrush, QColor
 from six.moves import range
 
@@ -87,7 +87,6 @@ class Controller(QObject):
 
         data = self.model.data(index)
         filename = self.model.absolute_path(data)
-        webbrowser.open(filename)
         burn_in_path = self.model.absolute_path(self.burnin_folder, data)
 
         webbrowser.open(burn_in_path
