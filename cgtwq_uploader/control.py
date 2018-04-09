@@ -120,8 +120,6 @@ class Controller(QObject):
             self.is_updating = False
 
     def _update_model(self):
-        QCoreApplication.processEvents()
-
         model = self.model
         root_index = model.root_index()
         cgtwq.update_setting()
