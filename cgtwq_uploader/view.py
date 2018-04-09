@@ -85,7 +85,7 @@ class Dialog(DialogWithDir):
         self.controller.change_root(self.directory)
 
     def on_root_changed(self, value):
-        self.dirEdit.setText(value)
+        self.directory = value
         self.listView.setRootIndex(self.controller.source_index(value))
 
     def on_view_item_clicked(self, index):
