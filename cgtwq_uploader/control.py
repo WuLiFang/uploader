@@ -55,12 +55,8 @@ class Controller(QObject):
         self.model = proxy_model
         self.is_updating = False
 
-        self.model.dataChanged.connect(self.on_data_changed)
-        self.model.sourceModel().directoryLoaded.connect(self.update_model)
+        self.model.layoutChanged.connect(self.update_model)
         self.upload_finished.connect(self.update_model)
-
-    def on_data_changed(self):
-        pass
 
     def change_pipeline(self, value):
         """Change target pipline.  """
