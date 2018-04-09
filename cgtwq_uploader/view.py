@@ -75,8 +75,8 @@ class Dialog(DialogWithDir):
             self.controller.update_model)
         self.actionOpenDir.triggered.connect(
             lambda: webbrowser.open(CONFIG['DIR']))
-        self.controller.root_changed.connect(self.on_root_changed)
 
+        self.controller.root_changed.connect(self.on_root_changed)
         self.controller.upload_finished.connect(self.activateWindow)
         self.controller.model.dataChanged.connect(self.on_data_changed)
 
