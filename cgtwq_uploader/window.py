@@ -32,22 +32,22 @@ class Dialog(DialogWithDir):
     def __init__(self, parent=None):
 
         edits_key = {
-            'serverEdit': 'SERVER',
-            'folderEdit': 'FOLDER',
+            # 'serverEdit': 'SERVER',
+            # 'folderEdit': 'FOLDER',
             'dirEdit': 'DIR',
-            'projectEdit': 'PROJECT',
-            'epEdit': 'EPISODE',
-            'scEdit': 'SCENE',
-            'tabWidget': 'MODE',
+            # 'projectEdit': 'PROJECT',
+            # 'epEdit': 'EPISODE',
+            # 'scEdit': 'SCENE',
+            # 'tabWidget': 'MODE',
             'checkBoxSubmit': 'IS_SUBMIT',
             'checkBoxBurnIn': 'IS_BURN_IN',
             'comboBoxPipeline': 'PIPELINE',
         }
         icons = {
             'toolButtonOpenDir': QStyle.SP_DirOpenIcon,
-            'toolButtonOpenServer': QStyle.SP_DirOpenIcon,
+            # 'toolButtonOpenServer': QStyle.SP_DirOpenIcon,
             'dirButton': QStyle.SP_DialogOpenButton,
-            'serverButton': QStyle.SP_DialogOpenButton,
+            # 'serverButton': QStyle.SP_DialogOpenButton,
             'syncButton': QStyle.SP_FileDialogToParent,
             None: QStyle.SP_FileDialogToParent,
         }
@@ -80,13 +80,30 @@ class Dialog(DialogWithDir):
         self.actionDir.triggered.connect(self.ask_dir)
         self.listView.clicked.connect(self.on_view_item_clicked)
         self.listView.doubleClicked.connect(self.on_view_item_double_clicked)
-        # self.actionSync.triggered.connect(self.upload)
+        self.actionSync.triggered.connect(
+            lambda: self.controller.upload(
+                self.checkBoxSubmit.checkState(),
+                self.lineEditNote.text()
+            )
+        )
+        self.actionSelectAll.triggered.connect(
+            self.controller.select_all)
+        self.actionReverseSelection.triggered.connect(
+            self.controller.reverse_selection)
+        self.actionReset.triggered.connect(
+            self.controller.update_model)
+        self.comboBoxPipeline.currentIndexChanged.connect(
+            lambda index: self.on_pipeline_changed(self.comboBoxPipeline.itemText(index)))
         # self.actionServer.triggered.connect(self.ask_server)
         self.actionOpenDir.triggered.connect(
             lambda: webbrowser.open(CONFIG['DIR']))
-        self.actionOpenServer.triggered.connect(
-            lambda: webbrowser.open(CONFIG['SERVER']))
-        self.upload_finished.connect(self.activateWindow)
+        # self.actionOpenServer.triggered.connect(
+        #     lambda: webbrowser.open(CONFIG['SERVER']))
+        self.controller.upload_finished.connect(self.activateWindow)
+        self.controller.model.dataChanged.connect(self.on_data_changed)
+
+        # Recover state.
+        self.controller.pipeline = CONFIG['PIPELINE']
 
     def on_root_changed(self, value):
         self.dirEdit.setText(value)
@@ -97,6 +114,17 @@ class Dialog(DialogWithDir):
 
     def on_view_item_double_clicked(self, index):
         self.controller.open_index(index, self.checkBoxBurnIn.checkState())
+
+    def on_pipeline_changed(self, pipeline):
+        self.controller.change_pipeline(pipeline)
+
+    def on_data_changed(self):
+        model = self.controller.model
+        states = [model.data(i, Qt.CheckStateRole) for i in model.indexes()]
+        checked_count = len([i for i in states if i == Qt.Checked])
+        total_count = len(states)
+        self.labelCount.setText('{}/{}'.format(checked_count, total_count))
+        self.syncButton.setEnabled(checked_count)
 
     def event(self, event):
         """Override.  """

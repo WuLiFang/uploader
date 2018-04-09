@@ -4,6 +4,8 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import os
+
 from Qt.QtCore import QDir, QPersistentModelIndex, QSortFilterProxyModel, Qt
 from Qt.QtWidgets import QFileSystemModel
 from six.moves import range
@@ -34,7 +36,7 @@ class DirectoryModel(QFileSystemModel):
 
         pindex = QPersistentModelIndex(index)
         if role in self.columns:
-            default = {Qt.CheckStateRole: Qt.Checked}.get(role)
+            default = {Qt.CheckStateRole: Qt.Unchecked}.get(role)
             return self.columns[role].get(pindex, default)
         return super(DirectoryModel, self).data(index, role)
 
@@ -116,5 +118,7 @@ class VersionFilterProxyModel(QSortFilterProxyModel):
         source_model = self.sourceModel()
         return source_model.isDir(source_index)
 
-
-import os
+    def indexes(self):
+        root_index = self.root_index()
+        count = self.rowCount(root_index)
+        return (self.index(i, 0, root_index) for i in range(count))

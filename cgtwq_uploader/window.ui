@@ -31,42 +31,42 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>流程</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBoxPipeline">
-         <item>
-          <property name="text">
-           <string>灯光</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>渲染</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>合成</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>输出</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>流程</string>
+       </property>
+      </widget>
      </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxPipeline">
+       <item>
+        <property name="text">
+         <string>灯光</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>渲染</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>合成</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>输出</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QToolButton" name="toolButtonOpenDir">
        <property name="text">
@@ -98,128 +98,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>至服务器文件夹</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item alignment="Qt::AlignLeft">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>服务器</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButtonOpenServer">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="serverEdit">
-           <property name="dragEnabled">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="serverButton">
-           <property name="text">
-            <string>浏览</string>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>文件夹</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="projectEdit"/>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="folderEdit"/>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="epEdit"/>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="scEdit"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>至CGTeamWork</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QCheckBox" name="checkBoxSubmit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="toolTip">
-          <string>上传时同时进行一次对应镜头的CGTeamWork提交</string>
-         </property>
-         <property name="text">
-          <string>提交</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>提交备注</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEditNote">
-           <property name="placeholderText">
-            <string>default_note_text</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -263,6 +141,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="toolButtonRefresh">
+         <property name="text">
+          <string>刷新</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="toolButtonSelectAll">
          <property name="text">
           <string>全选</string>
@@ -277,6 +162,40 @@
         </widget>
        </item>
       </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="checkBoxSubmit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>上传时同时进行一次对应镜头的CGTeamWork提交</string>
+       </property>
+       <property name="text">
+        <string>提交</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>备注</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEditNote">
+       <property name="placeholderText">
+        <string>default_note_text</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -319,11 +238,6 @@
     <string>open</string>
    </property>
   </action>
-  <action name="actionServer">
-   <property name="text">
-    <string>server</string>
-   </property>
-  </action>
   <action name="actionDir">
    <property name="text">
     <string>dir</string>
@@ -332,11 +246,6 @@
   <action name="actionOpenDir">
    <property name="text">
     <string>openDir</string>
-   </property>
-  </action>
-  <action name="actionOpenServer">
-   <property name="text">
-    <string>openServer</string>
    </property>
   </action>
   <action name="actionSelectAll">
@@ -355,10 +264,11 @@
    </property>
   </action>
   <zorder>statusBar</zorder>
-  <zorder>tabWidget</zorder>
-  <zorder>syncButton</zorder>
-  <zorder></zorder>
   <zorder>version_label</zorder>
+  <zorder></zorder>
+  <zorder></zorder>
+  <zorder></zorder>
+  <zorder>syncButton</zorder>
  </widget>
  <resources/>
  <connections>
@@ -443,86 +353,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBoxPipeline</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>actionReset</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>30</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>dirEdit</sender>
-   <signal>editingFinished()</signal>
-   <receiver>actionReset</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>272</x>
-     <y>19</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>serverButton</sender>
-   <signal>clicked()</signal>
-   <receiver>actionServer</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>410</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButtonOpenServer</sender>
-   <signal>clicked()</signal>
-   <receiver>actionOpenServer</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>99</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tabWidget</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>actionReset</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>216</x>
-     <y>85</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>checkBoxSubmit</sender>
    <signal>toggled(bool)</signal>
    <receiver>lineEditNote</receiver>
@@ -535,6 +365,22 @@
     <hint type="destinationlabel">
      <x>110</x>
      <y>107</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonRefresh</sender>
+   <signal>clicked()</signal>
+   <receiver>actionReset</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>303</x>
+     <y>427</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>

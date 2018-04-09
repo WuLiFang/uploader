@@ -4,207 +4,41 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import logging
+import mimetypes
 import os
-from collections import namedtuple
+import webbrowser
 from multiprocessing.dummy import Pool
 
 from Qt.QtCore import (QCoreApplication, QModelIndex, QObject, Qt, QTimer,
-                       Signal)
+                       Signal, Slot)
 from Qt.QtGui import QBrush, QColor
 from six import text_type
 from six.moves import range
 
 import cgtwq
 from wlf import mp_logging
+from wlf.decorators import run_async
 from wlf.env import has_nuke
-from wlf.files import is_same, version_filter
+from wlf.files import copy, is_same, version_filter
 from wlf.notify import CancelledError, progress
 from wlf.path import PurePath
 
-from .__about__ import __version__
 from .cgtwq_helper import CGTWQHelper
 from .exceptions import DatabaseError
-#         ret = self.dest_dict.get(PurePath(filename).shot, self.dest)
-#         if isinstance(ret, (str, unicode)):
-#             ret = str(PurePath(ret) / PurePath(filename).as_no_version())
-#         return ret
 from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
                     VersionFilterProxyModel)
 from .util import LOGGER
 
-# class ShotsFileDirectory(QObject):
-#     """Directory that store shots output files.  """
-
-#     pipeline_ext = {
-#         '灯光': ('.jpg', '.png', '.jpeg'),
-#         '渲染': ('.mov',),
-#         '合成': ('.mov',),
-#         '输出': ('.mov',)
-#     }
-#     dest_dict = None
-#     changed = Signal()
-#     updating = False
-#     _uploaded = None
-
-#     def __init__(self, path, pipeline, dest=None, parent=None):
-#         assert os.path.exists(
-#             path), '{} is not existed.'.format(path)
-#         assert pipeline in self.pipeline_ext, '{} is not a pipeline'.format(
-#             pipeline)
-
-#         LOGGER.debug('Init directory.')
-#         super(ShotsFileDirectory, self).__init__()
-#         self.path = path
-#         self.pipeline = pipeline
-#         self.ext = self.pipeline_ext[pipeline]
-#         self.dest = dest
-#         self.files = []
-#         self.dest_dict = {}
-#         self.parent = parent
-
-#         # Direcotry update timer
-#         self.update_timer = QTimer(self)
-#         self.update_timer.setInterval(1000)
-#         self.update_timer.timeout.connect(self.update)
-
-#     @run_async
-#     def update(self):
-#         """Update directory content.  """
-
-#         if self.updating:
-#             return
-
-#         self.updating = True
-
-#         if self.update_uploaded():
-#             self.changed.emit()
-#         try:
-#             path = self.path
-#             prev_files = self.files
-#             prev_shots = self.shots()
-#             self.files = version_filter(i for i in os.listdir(path)
-#                                         if i.lower().endswith(self.ext))
-#             if prev_files == self.files or self.shots() == prev_shots:
-#                 return
-
-#             if not prev_files or set(self.files).difference(prev_files):
-#                 try:
-#                     self.dest_dict = self.get_dest_dict()
-#                 except CancelledError:
-#                     self.dest_dict = {}
-#                     LOGGER.info('用户取消获取信息')
-#             self.changed.emit()
-#         finally:
-#             self.updating = False
-
-#     def get_dest_dict(self):
-#         """Get upload destinations.  """
-
-#         code_dict = {i[0]: i[1] for i
-#                      in cgtwq.PROJECT.all().get_fields('code', 'database')}
-
-#         def _get_database(filename):
-#             for k, v in code_dict.items():
-#                 if PurePath(filename).name.startswith(k):
-#                     return v
-#             raise ValueError('Can not match file to databse.')
-
-#         all_shots = self.shots()
-#         dest = self.dest
-#         dest_dict = {}
-
-#         def _get_from_database(database):
-#             if self.dest:
-#                 return
-
-#             shots = [i for i in all_shots if _get_database(i) == database]
-
-#             module = cgtwq.Database(database)['shot_task']
-#             select = module.filter(
-#                 (cgtwq.Field('shot.shot') | shots)
-#                 & (cgtwq.Field('pipeline') == self.pipeline)
-#             )
-
-#             current_id = cgtwq.current_account_id()
-#             current_name = cgtwq.current_account()
-
-#             for i in progress(select.get_fields('id', 'shot.shot', 'account_id', 'artist'),
-#                               '获取镜头信息', parent=self.parent):
-#                 id_, shot, account_id, artist = i
-#                 try:
-#                     if account_id and current_id not in account_id.split(','):
-#                         raise cgtwq.AccountError(
-#                             owner=artist, current=current_name)
-#                     dest_dict[shot] = module.select(
-#                         id_).get_filebox_submit().path
-#                 except cgtwq.CGTeamWorkException as ex:
-#                     dest_dict[shot] = ex
-#                 except KeyError as ex:
-#                     dest_dict[shot] = cgtwq.IDError(ex)
-
-#         if not dest:
-#             all_database = set(_get_database(i) for i in self.files)
-#             for database in progress(all_database, '连接数据库', parent=self.parent):
-#                 _get_from_database(database)
-
-#         return dest_dict
-
-#     def shots(self):
-#         """Files related shots.  """
-
-#         return sorted(PurePath(i).shot for i in self.files)
-
-#     @property
-#     def unexpected(self):
-#         """Files that can not get destination.  """
-
-#         files = self.files
-#         ret = set()
-
-#         for filename in files:
-#             dest = self.get_dest(filename)
-#             if not dest or isinstance(dest, Exception):
-#                 ret.add(filename)
-#         return ret
-
-#     @property
-#     def uploaded(self):
-#         """Files that does not need to upload agian.  """
-
-#         if self._uploaded is None:
-#             self.update_uploaded()
-#         return self._uploaded
-
-#     def update_uploaded(self):
-#         """Update uploaded files.  """
-
-#         old_value = self._uploaded
-#         files = self.files
-#         ret = set()
-
-#         for filename in files:
-#             src = os.path.join(self.path, filename)
-#             dst = self.get_dest(filename)
-
-#             if isinstance(dst, (str, unicode)) and is_same(src, dst):
-#                 ret.add(filename)
-
-#         self._uploaded = ret
-
-#         return old_value != ret
-
-#     def get_dest(self, filename):
-#         """Get cgteamwork upload destination for @filename.  """
-
 LOGGER = logging.getLogger(__name__)
-import webbrowser
 
 
 class Controller(QObject):
     """Controller for uploader.  """
     root_changed = Signal(str)
+    upload_finished = Signal()
     pipeline = '合成'
     burnin_folder = 'burn-in'
+
     if has_nuke():
         brushes = {'local': QBrush(QColor(200, 200, 200)),
                    'uploaded': QBrush(QColor(100, 100, 100)),
@@ -225,10 +59,13 @@ class Controller(QObject):
         self.model.dataChanged.connect(self.on_data_changed)
         self.model.sourceModel().directoryLoaded.connect(self.update_model)
 
+        self.upload_finished.connect(self.update_model)
+
     def on_data_changed(self):
         pass
 
     def change_pipeline(self, value):
+        """Change target pipline.  """
         self.pipeline = value
         self.update_model()
 
@@ -277,19 +114,32 @@ class Controller(QObject):
                 model.setData(index, False, ROLE_CHECKABLE)
                 model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
                 return
-            filename = model.data(index)
+            data = model.data(index)
+            filename = self.model.absolute_path(data)
+
+            def _on_error(reason):
+                model.setData(index, reason, Qt.StatusTipRole)
+                model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
+                model.setData(index,
+                              self.brushes['error'],
+                              Qt.ForegroundRole)
+
             try:
                 try:
-                    entry = CGTWQHelper.get_entry(filename, self.pipeline)
+                    entry = CGTWQHelper.get_entry(data, self.pipeline)
                 except DatabaseError:
-                    model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
-                    model.setData(index, '找不到对应数据库', Qt.ToolTipRole)
+                    _on_error('找不到对应数据库')
                     return
+                except ValueError as ex:
+                    if ex.message == 'Empty selection.':
+                        _on_error('找不到对应任务')
+                        return
+                    raise
                 assert isinstance(entry, cgtwq.Entry), type(entry)
-                shot = PurePath(filename).shot
+                shot = PurePath(data).shot
                 dest = (model.data(index, ROLE_DEST)
                         or (PurePath(entry.filebox.get_submit().path) /
-                            PurePath(shot).with_suffix(PurePath(filename).suffix)).as_posix())
+                            PurePath(shot).with_suffix(PurePath(data).suffix)).as_posix())
 
                 # Set dest.
                 model.setData(index, dest, ROLE_DEST)
@@ -306,24 +156,29 @@ class Controller(QObject):
 
                 # Set statustip.
                 is_ok = False
+                is_uploaded = is_same(filename, dest)
                 if current_id in entry['account_id'].split(','):
                     is_ok = True
-                    model.setData(index, '等待上传', Qt.StatusTipRole)
+                    model.setData(
+                        index, '已上传' if is_uploaded else '等待上传', Qt.StatusTipRole)
                 else:
                     assigned = entry['artist']
-                    model.setData(index,
-                                  '此任务已分配给:{0}'.format(assigned)
-                                  if assigned else '任务未分配',
-                                  Qt.StatusTipRole)
+                    _on_error(
+                        '此任务已分配给:{0}'.format(assigned)
+                        if assigned else '任务未分配'
+                    )
 
+                # Set check state.
                 model.setData(index, is_ok, ROLE_CHECKABLE)
-                model.setData(
-                    index, Qt.Checked if is_ok else Qt.Unchecked, Qt.CheckStateRole)
+                if not is_ok or is_uploaded:
+                    model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
 
                 # Set color.
                 if is_ok:
                     model.setData(index,
-                                  self.brushes['local'],
+                                  self.brushes['uploaded']
+                                  if is_uploaded
+                                  else self.brushes['local'],
                                   Qt.ForegroundRole)
                 else:
                     model.setData(index,
@@ -343,8 +198,58 @@ class Controller(QObject):
                 parent=self.parent()):
             pass
 
-    def upload(self):
-        pass
+    def upload(self, is_submit=True, submit_note=''):
+        """Upload videos to server.  """
+
+        files = self.model.checked_files()
+        files = [self.model.absolute_path(i) for i in files]
+        model = self.model
+        root_index = model.root_index()
+        count = model.rowCount(root_index)
+
+        @run_async
+        def _run():
+            try:
+                for i in progress(range(count), '上传', parent=self.parent()):
+                    index = model.index(i, 0, root_index)
+                    if model.data(index, Qt.CheckStateRole):
+                        data = model.data(index)
+                        src = model.absolute_path(data)
+                        dst = model.data(index, ROLE_DEST)
+                        copy(src, dst)
+                        entry = CGTWQHelper.get_entry(data, self.pipeline)
+                        # Submit
+                        if is_submit:
+                            entry.submit([dst], note=submit_note)
+                        # Set image
+                        mime, _ = mimetypes.guess_type(src)
+                        if mime and mime.startswith('image'):
+                            entry.set_image(src)
+            except CancelledError:
+                LOGGER.info('用户取消上传')
+            self.upload_finished.emit()
+        _run()
+
+    def reverse_selection(self):
+        model = self.model
+        for i in model.indexes():
+            state = model.data(i, Qt.CheckStateRole)
+            if model.data(i, Qt.ForegroundRole) == self.brushes['local']:
+                model.setData(i, Qt.Unchecked
+                              if state else Qt.Checked,
+                              Qt.CheckStateRole)
+            else:
+                model.setData(i, Qt.Unchecked,
+                              Qt.CheckStateRole)
+
+    def select_all(self):
+        model = self.model
+        for i in model.indexes():
+            if model.data(i, Qt.ForegroundRole) == self.brushes['local']:
+                model.setData(i, Qt.Checked, Qt.CheckStateRole)
+            else:
+                model.setData(i, Qt.Unchecked,
+                              Qt.CheckStateRole)
 
 
 mp_logging.basic_config(level='DEBUG')
