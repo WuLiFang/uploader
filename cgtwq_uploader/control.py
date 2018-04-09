@@ -204,9 +204,11 @@ class Controller(QObject):
                                   self.brushes['error'],
                                   Qt.ForegroundRole)
 
+                return data
             except:  # pylint: disable=bare-except
                 logging.error(
                     'Unexpect error during access database.', exc_info=True)
+                return '<出错>'
 
         pool = Pool()
         count = model.rowCount(model.root_index())
