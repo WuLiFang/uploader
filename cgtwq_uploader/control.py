@@ -14,7 +14,6 @@ from Qt.QtGui import QBrush, QColor
 from six.moves import range
 
 import cgtwq
-from wlf import mp_logging
 from wlf.decorators import run_async
 from wlf.env import has_nuke
 from wlf.files import copy, is_same
