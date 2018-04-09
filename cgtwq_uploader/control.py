@@ -193,11 +193,12 @@ from .util import LOGGER
 from Qt.QtGui import QBrush, QColor
 
 from wlf.env import has_nuke
+from .model import DirectoryModel, VersionFilterProxyModel
 
 
 class Controller(QObject):
     """Controller for uploader.  """
-
+    root_changed = Signal(str)
     pipeline = '合成'
     if has_nuke():
         brushes = {'local': QBrush(QColor(200, 200, 200)),
@@ -208,10 +209,14 @@ class Controller(QObject):
                    'uploaded': QBrush(Qt.gray),
                    'error': QBrush(Qt.red)}
 
-    def __init__(self, model, parent=None):
+    def __init__(self, parent=None):
         super(Controller, self).__init__(parent)
-        assert isinstance(model, VersionFilterProxyModel), type(model)
-        self.model = model
+        model = DirectoryModel(self)
+
+        proxy_model = VersionFilterProxyModel(self)
+
+        proxy_model.setSourceModel(model)
+        self.model = proxy_model
         self.model.dataChanged.connect(self.on_data_changed)
         self.model.sourceModel().directoryLoaded.connect(self.update_model)
 
@@ -221,6 +226,15 @@ class Controller(QObject):
     def change_pipeline(self, value):
         self.pipeline = value
         self.update_model()
+
+    def change_root(self, value):
+        self.model.sourceModel().setRootPath(value)
+        self.root_changed.emit(value)
+
+    def source_index(self, path):
+        model = self.model
+        source_model = model.sourceModel()
+        return model.mapFromSource(source_model.index(path))
 
     def update_model(self):
         """Update directory model.  """

@@ -20,7 +20,6 @@ from wlf.uitools import DialogWithDir
 from .util import CONFIG, LOGGER, l10n
 from .control import Controller
 from . import filetools
-from .model import DirectoryModel, VersionFilterProxyModel
 
 
 class Dialog(DialogWithDir):
@@ -63,23 +62,14 @@ class Dialog(DialogWithDir):
         self.version_label.setText('v{}'.format(__version__))
         self.lineEditNote.setPlaceholderText(self.default_note)
 
-        # Set model
-        model = DirectoryModel(self)
+        # Set controller
+        self.controller = Controller(self)
+        self.listView.setModel(self.controller.model)
 
-        proxy_model = VersionFilterProxyModel(self)
+        self.dirEdit.textChanged.connect(self.controller.change_root)
+        self.controller.root_changed.connect(self.on_root_changed)
 
-        proxy_model.setSourceModel(model)
-        self.listView.setModel(proxy_model)
-        self.controller = Controller(proxy_model, self)
-
-        def _update_model():
-            print(proxy_model.checked_files())
-
-            self.listView.setRootIndex(proxy_model.mapFromSource(
-                model.setRootPath(self.directory)))
-
-        _update_model()
-        self.dirEdit.textChanged.connect(_update_model)
+        self.controller.change_root(self.directory)
 
         # # Update timer
         # self.update_timer = QTimer()
@@ -95,6 +85,9 @@ class Dialog(DialogWithDir):
         self.actionOpenServer.triggered.connect(
             lambda: webbrowser.open(CONFIG['SERVER']))
         self.upload_finished.connect(self.activateWindow)
+
+    def on_root_changed(self, value):
+        self.listView.setRootIndex(self.controller.source_index(value))
 
     def event(self, event):
         """Override.  """
