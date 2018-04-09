@@ -109,7 +109,7 @@ class VersionFilterProxyModel(QSortFilterProxyModel):
     def absolute_path(self, *path):
         """Convert path to absolute path.  """
         model = self.sourceModel()
-        return os.path.join(model.rootPath(), *path)
+        return os.path.abspath(os.path.join(model.rootPath(), *path))
 
     def is_dir(self, index):
         """Wrapper for `self.sourceModel().isDir`.  """
@@ -124,3 +124,9 @@ class VersionFilterProxyModel(QSortFilterProxyModel):
         root_index = self.root_index()
         count = self.rowCount(root_index)
         return (self.index(i, 0, root_index) for i in range(count))
+
+    def file_path(self, index):
+        """Wrapper for `self.sourceModel().filePath`.  """
+
+        index = self.mapToSource(index)
+        return self.sourceModel().filePath(index)

@@ -50,14 +50,13 @@ class Controller(QObject):
     def __init__(self, parent=None):
         super(Controller, self).__init__(parent)
         model = DirectoryModel(self)
-
         proxy_model = VersionFilterProxyModel(self)
-
         proxy_model.setSourceModel(model)
         self.model = proxy_model
+        self.is_updating = False
+
         self.model.dataChanged.connect(self.on_data_changed)
         self.model.sourceModel().directoryLoaded.connect(self.update_model)
-
         self.upload_finished.connect(self.update_model)
 
     def on_data_changed(self):
@@ -74,7 +73,7 @@ class Controller(QObject):
         if isinstance(value, QModelIndex):
             if not self.model.is_dir(value):
                 return
-            data = self.model.data(value)
+            data = self.model.file_path(value)
             value = self.model.absolute_path(data)
 
         value = os.path.normpath(value)
@@ -116,7 +115,16 @@ class Controller(QObject):
 
     def update_model(self):
         """Update directory model.  """
+        if self.is_updating:
+            return
 
+        self.is_updating = True
+        try:
+            self._update_model()
+        finally:
+            self.is_updating = False
+
+    def _update_model(self):
         QCoreApplication.processEvents()
 
         model = self.model
@@ -147,7 +155,7 @@ class Controller(QObject):
                     _on_error('找不到对应数据库')
                     return
                 except ValueError as ex:
-                    if ex.message == 'Empty selection.':
+                    if ex.args[0] == 'Empty selection.':
                         _on_error('找不到对应任务')
                         return
                     raise
@@ -230,7 +238,7 @@ class Controller(QObject):
                     index = model.index(i, 0, root_index)
                     if model.data(index, Qt.CheckStateRole):
                         data = model.data(index)
-                        src = model.absolute_path(data)
+                        src = model.file_path(index)
                         dst = model.data(index, ROLE_DEST)
                         copy(src, dst)
                         entry = CGTWQHelper.get_entry(data, self.pipeline)
