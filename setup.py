@@ -14,12 +14,12 @@ setup(
     package_data={'': ['*.ui']},
     install_requires=[
         'wlf>=0.3.3',
-        'cgtwq>=1.0.2',
+        'cgtwq>=1.2.0',
     ],
     dependency_links=[
         ('https://github.com/WuLiFang/wlf/archive/0.3.3.tar.gz'
          '#egg=wlf-0.3.3'),
-        ('https://github.com/WuLiFang/cgtwq/archive/1.1.0.tar.gz'
-         '#egg=cgtwq-1.1.0'),
+        ('https://github.com/WuLiFang/cgtwq/archive/1.2.0.tar.gz'
+         '#egg=cgtwq-1.2.0'),
     ],
 )

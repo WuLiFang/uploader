@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c55ca15291ebc56e0151484f74cc8bba8755cf1bf094836298c3beda346f2a9f"
+            "sha256": "84d5bd6990261e9c4d81f45f83dfb1b902ef303e742ab49a1c73048ea324ee59"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,14 +16,11 @@
         ]
     },
     "default": {
-        "1db2020": {
-            "file": "https://github.com/WuLiFang/cgtwq/archive/1.0.2.tar.gz"
+        "1ba1c41": {
+            "file": "https://github.com/WuLiFang/cgtwq/archive/1.2.0.tar.gz"
         },
         "544be00": {
             "file": "https://github.com/WuLiFang/wlf/archive/0.3.3.tar.gz"
-        },
-        "671bbd2": {
-            "file": "https://github.com/WuLiFang/cgtwq/archive/1.1.0.tar.gz"
         },
         "beautifulsoup4": {
             "hashes": [

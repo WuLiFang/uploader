@@ -14,13 +14,14 @@ from Qt.QtGui import QBrush, QColor
 from six.moves import range
 
 import cgtwq
+from cgtwq.helper.qt import ask_login
+from cgtwq.helper.wlf import CGTWQHelper
 from wlf.decorators import run_async
 from wlf.env import has_nuke
 from wlf.files import copy, is_same
 from wlf.notify import CancelledError, progress
 from wlf.path import PurePath
 
-from .cgtwq_helper import CGTWQHelper
 from .exceptions import DatabaseError
 from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
                     VersionFilterProxyModel)
@@ -36,6 +37,7 @@ class Controller(QObject):
     upload_finished = Signal()
     pipeline = '合成'
     burnin_folder = 'burn-in'
+    default_widget = None
 
     if has_nuke():
         brushes = {'local': QBrush(QColor(200, 200, 200)),
@@ -121,8 +123,13 @@ class Controller(QObject):
     def _update_model(self):
         model = self.model
         root_index = model.root_index()
-        cgtwq.update_setting()
-        current_id = cgtwq.current_account_id()
+        if cgtwq.DesktopClient.is_logged_in():
+            cgtwq.update_setting()
+            current_id = cgtwq.current_account_id()
+        elif not cgtwq.server.setting.DEFAULT_TOKEN:
+            account_info = ask_login(self.default_widget)
+            cgtwq.server.setting.DEFAULT_TOKEN = account_info.token
+            current_id = account_info.account_id
 
         def _do(i):
             index = model.index(i, 0, root_index)

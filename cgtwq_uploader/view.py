@@ -50,6 +50,7 @@ class Dialog(DialogWithDir):
 
         # Set controller
         self.controller = Controller(self)
+        self.controller.widget = self
         self.listView.setModel(self.controller.model)
 
         # Signals

@@ -21,7 +21,7 @@ psutil = ">=5.4.3"
 pyblish = ">=1.4.3"
 requests = "*"
 websocket-client = "*"
-"671bbd2" = {file = "https://github.com/WuLiFang/cgtwq/archive/1.1.0.tar.gz"}
+"1ba1c41" = {file = "https://github.com/WuLiFang/cgtwq/archive/1.2.0.tar.gz"}
 
 [requires]
 python_version = "2.7"
