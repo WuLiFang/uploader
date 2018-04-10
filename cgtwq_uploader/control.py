@@ -243,9 +243,10 @@ class Controller(QObject):
                         dst = model.data(index, ROLE_DEST)
                         copy(src, dst)
                         entry = CGTWQHelper.get_entry(data, self.pipeline)
+                        assert isinstance(entry, cgtwq.Entry)
                         # Submit
                         if is_submit:
-                            entry.submit([dst], note=submit_note)
+                            entry.submit([dst], [dst], note=submit_note)
                         # Set image
                         mime, _ = mimetypes.guess_type(src)
                         if mime and mime.startswith('image'):
