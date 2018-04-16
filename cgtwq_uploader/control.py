@@ -130,6 +130,9 @@ class Controller(QObject):
             account_info = ask_login(self.default_widget)
             cgtwq.server.setting.DEFAULT_TOKEN = account_info.token
             current_id = account_info.account_id
+        else:
+            current_id = cgtwq.get_account_id(
+                cgtwq.server.setting.DEFAULT_TOKEN)
 
         def _do(i):
             index = model.index(i, 0, root_index)
