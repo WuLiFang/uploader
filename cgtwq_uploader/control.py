@@ -9,14 +9,13 @@ import os
 import webbrowser
 from multiprocessing.dummy import Pool
 
-from Qt.QtCore import QModelIndex, QObject, Qt, Signal
+from Qt.QtCore import QModelIndex, QObject, Qt, Signal, QCoreApplication
 from Qt.QtGui import QBrush, QColor
 from six.moves import range
 
 import cgtwq
 from cgtwq.helper.qt import ask_login
 from cgtwq.helper.wlf import CGTWQHelper
-from wlf.decorators import run_async
 from wlf.env import has_nuke
 from wlf.files import copy, is_same
 from wlf.notify import CancelledError, progress
@@ -26,8 +25,18 @@ from .exceptions import DatabaseError
 from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
                     VersionFilterProxyModel)
 from .util import LOGGER
+from collections import namedtuple
 
 LOGGER = logging.getLogger(__name__)
+
+
+class UploadTask(
+    namedtuple('UploadTask',
+               ('label', 'src',
+                'dst', 'is_submit', 'pipeline',
+                'submit_note'))):
+    def __str__(self):
+        return self.label
 
 
 class Controller(QObject):
@@ -35,6 +44,7 @@ class Controller(QObject):
 
     root_changed = Signal(str)
     upload_finished = Signal()
+    upload_started = Signal()
     pipeline = '合成'
     burnin_folder = 'burn-in'
     default_widget = None
@@ -219,45 +229,74 @@ class Controller(QObject):
 
         pool = Pool()
         count = model.rowCount(model.root_index())
-        for _ in progress(
-                pool.imap_unordered(_do, range(count)),
-                name='访问数据库',
-                total=count,
-                parent=self.parent()):
-            pass
+        try:
+            for _ in progress(
+                    pool.imap_unordered(_do, range(count)),
+                    name='访问数据库',
+                    total=count,
+                    parent=self.parent()):
+                pass
+        except CancelledError:
+            LOGGER.info('用户取消')
 
     def upload(self, is_submit=True, submit_note=''):
         """Upload videos to server.  """
 
-        files = self.model.checked_files()
-        files = [self.model.absolute_path(i) for i in files]
+        def _do(i):
+            assert isinstance(i, UploadTask)
+            copy(i.src, i.dst)
+            entry = CGTWQHelper.get_entry(PurePath(i.src).name, i.pipeline)
+            assert isinstance(entry, cgtwq.Entry)
+            # Submit
+            if i.is_submit:
+                entry.submit([i.dst], [i.dst], note=i.submit_note)
+            # Set image
+            mime, _ = mimetypes.guess_type(i.src)
+            if mime and mime.startswith('image'):
+                entry.set_image(i.src)
+            return i.label
+
+        pool = Pool()
+        tasks = self.tasks(is_submit, submit_note)
+        self.upload_started.emit()
+        try:
+            for i in progress(
+                    tasks,
+                    name='上传',
+                    parent=self.parent()):
+                result = pool.apply_async(_do, (i,))
+                while not result.ready():
+                    QCoreApplication.processEvents()
+                if not result.successful():
+                    break
+        except CancelledError:
+            LOGGER.info('用户取消')
+        self.upload_finished.emit()
+
+    def tasks(self, is_submit=True, submit_note=''):
+        """Get task list from model.
+            is_submit (bool, optional): Defaults to True. Task attribute
+            submit_note (str, optional): Defaults to ''. Task attribute
+
+        Returns:
+            list[UploadTask]: Tasks list.
+        """
+
         model = self.model
         root_index = model.root_index()
         count = model.rowCount(root_index)
 
-        @run_async
-        def _run():
-            try:
-                for i in progress(range(count), '上传', parent=self.parent()):
-                    index = model.index(i, 0, root_index)
-                    if model.data(index, Qt.CheckStateRole):
-                        data = model.data(index)
-                        src = model.file_path(index)
-                        dst = model.data(index, ROLE_DEST)
-                        copy(src, dst)
-                        entry = CGTWQHelper.get_entry(data, self.pipeline)
-                        assert isinstance(entry, cgtwq.Entry)
-                        # Submit
-                        if is_submit:
-                            entry.submit([dst], [dst], note=submit_note)
-                        # Set image
-                        mime, _ = mimetypes.guess_type(src)
-                        if mime and mime.startswith('image'):
-                            entry.set_image(src)
-            except CancelledError:
-                LOGGER.info('用户取消上传')
-            self.upload_finished.emit()
-        _run()
+        ret = []
+        for i in range(count):
+            index = model.index(i, 0, root_index)
+            if model.data(index, Qt.CheckStateRole):
+                label = model.data(index, Qt.DisplayRole)
+                src = model.file_path(index)
+                dst = model.data(index, ROLE_DEST)
+                task = UploadTask(label, src, dst, is_submit,
+                                  self.pipeline, submit_note)
+                ret.append(task)
+        return ret
 
     def reverse_selection(self):
         """Reverse current selection.  """

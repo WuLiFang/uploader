@@ -45,6 +45,7 @@ class Dialog(DialogWithDir):
             parent=parent,
             edits_key=edits_key,
             dir_edit='dirEdit')
+        self.is_uploading = False
         self.version_label.setText('v{}'.format(__version__))
         self.lineEditNote.setPlaceholderText(self.default_note)
 
@@ -78,7 +79,8 @@ class Dialog(DialogWithDir):
             lambda: webbrowser.open(CONFIG['DIR']))
 
         self.controller.root_changed.connect(self.on_root_changed)
-        self.controller.upload_finished.connect(self.activateWindow)
+        self.controller.upload_started.connect(self.on_upload_started)
+        self.controller.upload_finished.connect(self.on_upload_finished)
         self.controller.model.dataChanged.connect(self.on_data_changed)
 
         # Recover state.
@@ -104,7 +106,15 @@ class Dialog(DialogWithDir):
         checked_count = len([i for i in states if i == Qt.Checked])
         total_count = len(states)
         self.labelCount.setText('{}/{}'.format(checked_count, total_count))
-        self.syncButton.setEnabled(checked_count)
+        self.syncButton.setEnabled(not self.is_uploading and checked_count)
+
+    def on_upload_started(self):
+        self.is_uploading = True
+        self.syncButton.setEnabled(False)
+
+    def on_upload_finished(self):
+        self.is_uploading = False
+        self.activateWindow()
 
     def event(self, event):
         """Override.  """
