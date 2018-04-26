@@ -251,9 +251,9 @@ class Controller(QObject):
             if i.is_submit:
                 entry.submit([i.dst], [i.dst], note=i.submit_note)
             # Set image
-            mime, _ = mimetypes.guess_type(i.src)
+            mime, _ = mimetypes.guess_type(i.dst)
             if mime and mime.startswith('image'):
-                entry.set_image(i.src)
+                entry.set_image(i.dst)
             return i.label
 
         pool = Pool()
