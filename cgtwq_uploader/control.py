@@ -52,11 +52,13 @@ class Controller(QObject):
     if has_nuke():
         brushes = {'local': QBrush(QColor(200, 200, 200)),
                    'uploaded': QBrush(QColor(100, 100, 100)),
-                   'error': QBrush(Qt.red)}
+                   'error': QBrush(Qt.red),
+                   'warning': QBrush(QColor(255, 200, 90))}
     else:
         brushes = {'local': QBrush(Qt.black),
                    'uploaded': QBrush(Qt.gray),
-                   'error': QBrush(Qt.red)}
+                   'error': QBrush(Qt.red),
+                   'warning': QBrush(QColor(200, 100, 50))}
 
     def __init__(self, parent=None):
         super(Controller, self).__init__(parent)
@@ -192,8 +194,17 @@ class Controller(QObject):
 
                 # Set statustip.
                 is_ok = False
+                is_warning = False
                 is_uploaded = is_same(filename, dest)
-                if current_id in entry['account_id'].split(','):
+                account_id = entry['account_id']
+                if account_id is None:
+                    is_ok = True
+                    is_warning = True
+                    model.setData(
+                        index,
+                        '*注意*: 此任务尚未分配',
+                        Qt.StatusTipRole)
+                elif current_id in account_id.split(','):
                     is_ok = True
                     model.setData(
                         index, '已上传' if is_uploaded else '等待上传', Qt.StatusTipRole)
@@ -210,7 +221,11 @@ class Controller(QObject):
                     model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
 
                 # Set color.
-                if is_ok:
+                if is_warning:
+                    model.setData(index,
+                                  self.brushes['warning'],
+                                  Qt.ForegroundRole)
+                elif is_ok:
                     model.setData(index,
                                   self.brushes['uploaded']
                                   if is_uploaded
