@@ -73,7 +73,9 @@ class Controller(QObject):
 
     def change_pipeline(self, value):
         """Change target pipline.  """
+
         self.pipeline = value
+        self.model.sourceModel().columns[ROLE_DEST].clear()
         self.update_model()
 
     def change_root(self, value):
