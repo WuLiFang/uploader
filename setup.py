@@ -1,6 +1,7 @@
 """Python setup script.  """
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 __about__ = {}
 execfile(os.path.join(os.path.dirname(__file__),
@@ -13,13 +14,13 @@ setup(
     packages=find_packages(),
     package_data={'': ['*.ui']},
     install_requires=[
-        'wlf>=0.3.4',
-        'cgtwq>=1.2.0',
+        'wlf~=0.4',
+        'cgtwq~=1.4',
     ],
     dependency_links=[
-        ('https://github.com/WuLiFang/wlf/archive/0.3.4.tar.gz'
-         '#egg=wlf-0.3.4'),
-        ('https://github.com/WuLiFang/cgtwq/archive/1.3.2.tar.gz'
-         '#egg=cgtwq-1.3.2'),
+        ('https://github.com/WuLiFang/wlf/archive/0.4.0.tar.gz'
+         '#egg=wlf-0.4.0'),
+        ('https://github.com/WuLiFang/cgtwq/archive/1.4.0.tar.gz'
+         '#egg=cgtwq-1.4.0'),
     ],
 )

@@ -10,7 +10,7 @@ from Qt.QtCore import QDir, QPersistentModelIndex, QSortFilterProxyModel, Qt
 from Qt.QtWidgets import QFileSystemModel
 from six.moves import range
 
-from wlf.files import version_filter
+from wlf.fileutil import version_filter
 
 ROLE_DEST = Qt.UserRole + 1
 ROLE_CHECKABLE = Qt.UserRole + 2
@@ -20,6 +20,7 @@ class DirectoryModel(QFileSystemModel):
     """Checkable fileSystem model.  """
 
     def __init__(self, parent=None):
+        
         super(DirectoryModel, self).__init__(parent)
         self.setFilter(QDir.NoDot | QDir.Files | QDir.Dirs)
         self.columns = {

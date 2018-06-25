@@ -8,7 +8,7 @@ import webbrowser
 from Qt.QtCore import QEvent, Qt, Signal
 from Qt.QtWidgets import QStyle
 
-from wlf.uitools import DialogWithDir
+from wlf.uitools.template.dialog_with_dir import DialogWithDir
 
 from . import filetools
 from .__about__ import __version__
@@ -22,29 +22,17 @@ class Dialog(DialogWithDir):
     default_note = '自上传工具提交'
     instance = None
     upload_finished = Signal()
+    icons = {
+        'toolButtonOpenDir': QStyle.SP_DirOpenIcon,
+        'dirButton': QStyle.SP_DialogOpenButton,
+        'syncButton': QStyle.SP_FileDialogToParent,
+        None: QStyle.SP_FileDialogToParent,
+    }
+    uifile = filetools.path('dialog.ui')
 
     def __init__(self, parent=None):
 
-        edits_key = {
-            'dirEdit': 'DIR',
-            'checkBoxSubmit': 'IS_SUBMIT',
-            'checkBoxBurnIn': 'IS_BURN_IN',
-            'comboBoxPipeline': 'PIPELINE',
-        }
-        icons = {
-            'toolButtonOpenDir': QStyle.SP_DirOpenIcon,
-            'dirButton': QStyle.SP_DialogOpenButton,
-            'syncButton': QStyle.SP_FileDialogToParent,
-            None: QStyle.SP_FileDialogToParent,
-        }
-        DialogWithDir.__init__(
-            self,
-            filetools.path('dialog.ui'),
-            config=CONFIG,
-            icons=icons,
-            parent=parent,
-            edits_key=edits_key,
-            dir_edit='dirEdit')
+        DialogWithDir.__init__(self, config=CONFIG, parent=parent)
         self.is_uploading = False
         self.version_label.setText('v{}'.format(__version__))
         self.lineEditNote.setPlaceholderText(self.default_note)
@@ -86,6 +74,20 @@ class Dialog(DialogWithDir):
         # Recover state.
         self.controller.pipeline = CONFIG['PIPELINE']
         self.controller.change_root(self.directory)
+
+    def _edits_key(self):
+        return {
+            'dirEdit': 'DIR',
+            'checkBoxSubmit': 'IS_SUBMIT',
+            'checkBoxBurnIn': 'IS_BURN_IN',
+            'comboBoxPipeline': 'PIPELINE',
+        }
+
+    @property
+    def dir_edit(self):
+        """Line edit for dir input.  """
+
+        return self.dirEdit
 
     def on_root_changed(self, value):
         self.directory = value

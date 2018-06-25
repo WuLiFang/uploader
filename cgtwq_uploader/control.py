@@ -7,9 +7,10 @@ import logging
 import mimetypes
 import os
 import webbrowser
+from collections import namedtuple
 from multiprocessing.dummy import Pool
 
-from Qt.QtCore import QModelIndex, QObject, Qt, Signal, QCoreApplication
+from Qt.QtCore import QCoreApplication, QModelIndex, QObject, Qt, Signal
 from Qt.QtGui import QBrush, QColor
 from six.moves import range
 
@@ -17,15 +18,14 @@ import cgtwq
 from cgtwq.helper.qt import ask_login
 from cgtwq.helper.wlf import CGTWQHelper
 from wlf.env import has_nuke
-from wlf.files import copy, is_same
-from wlf.notify import CancelledError, progress
+from wlf.fileutil import copy, is_same
 from wlf.path import PurePath
+from wlf.progress import CancelledError, progress
 
 from .exceptions import DatabaseError
 from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
                     VersionFilterProxyModel)
 from .util import LOGGER
-from collections import namedtuple
 
 LOGGER = logging.getLogger(__name__)
 

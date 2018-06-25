@@ -20,8 +20,8 @@ psutil = ">=5.4.3"
 pyblish = ">=1.4.3"
 requests = "*"
 websocket-client = "*"
-"544be00" = {file = "https://github.com/WuLiFang/wlf/archive/0.3.10.tar.gz"}
-"44cbfa0" = {file = "https://github.com/WuLiFang/cgtwq/archive/1.3.2.tar.gz"}
+"ef1480d" = {file = "https://github.com/WuLiFang/wlf/archive/0.4.0.tar.gz"}
+"f7f3744" = {file = "https://github.com/WuLiFang/cgtwq/archive/1.4.0.tar.gz"}
 
 [requires]
 python_version = "2.7"
