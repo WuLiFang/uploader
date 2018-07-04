@@ -223,15 +223,17 @@ class Controller(QObject):
                     model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
 
                 # Set color.
-                if is_warning:
+                if is_uploaded:
+                    model.setData(index,
+                                  self.brushes['uploaded'],
+                                  Qt.ForegroundRole)
+                elif is_warning:
                     model.setData(index,
                                   self.brushes['warning'],
                                   Qt.ForegroundRole)
                 elif is_ok:
                     model.setData(index,
-                                  self.brushes['uploaded']
-                                  if is_uploaded
-                                  else self.brushes['local'],
+                                  self.brushes['local'],
                                   Qt.ForegroundRole)
                 else:
                     model.setData(index,
