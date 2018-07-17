@@ -123,6 +123,11 @@ class Controller(QObject):
         source_model = model.sourceModel()
         return model.mapFromSource(source_model.index(path))
 
+    def _ask_login(self):
+        account_info = ask_login(self.default_widget)
+        cgtwq.server.setting.DEFAULT_TOKEN = account_info.token
+        return account_info
+
     def update_model(self):
         """Update directory model.  """
         if self.is_updating:
@@ -131,6 +136,8 @@ class Controller(QObject):
         self.is_updating = True
         try:
             self._update_model()
+        except cgtwq.LoginError:
+            self._ask_login()
         finally:
             self.is_updating = False
 
@@ -141,9 +148,7 @@ class Controller(QObject):
             cgtwq.update_setting()
             current_id = cgtwq.current_account_id()
         elif not cgtwq.server.setting.DEFAULT_TOKEN:
-            account_info = ask_login(self.default_widget)
-            cgtwq.server.setting.DEFAULT_TOKEN = account_info.token
-            current_id = account_info.account_id
+            current_id = self._ask_login().account_id
         else:
             current_id = cgtwq.get_account_id(
                 cgtwq.server.setting.DEFAULT_TOKEN)
