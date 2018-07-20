@@ -204,7 +204,7 @@ class Controller(QObject):
                 is_warning = False
                 is_uploaded = is_same(filename, dest)
                 account_id = entry['account_id']
-                if account_id is None:
+                if not account_id:
                     is_ok = True
                     is_warning = True
                     model.setData(
