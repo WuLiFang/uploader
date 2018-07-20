@@ -20,7 +20,7 @@ setup(
     dependency_links=[
         ('https://github.com/WuLiFang/wlf/archive/0.4.1.tar.gz'
          '#egg=wlf-0.4.1'),
-        ('https://github.com/WuLiFang/cgtwq/archive/2.0.0.tar.gz'
-         '#egg=cgtwq-2.0.0'),
+        ('https://github.com/WuLiFang/cgtwq/archive/2.0.1.tar.gz'
+         '#egg=cgtwq-2.0.1'),
     ],
 )
