@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "12b1e7a190b509b1d4789606213d88cdbbb2e6525999f79d1e44cdd3d5ee96c4"
+            "sha256": "ca2e4b3d6a1f678015908034e87016f04bb36123e494d3d990960d41e0c50c79"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -71,7 +71,7 @@
             "version": "==1.11.5"
         },
         "cgtwq": {
-            "file": "https://github.com/WuLiFang/cgtwq/archive/2.1.0.tar.gz"
+            "file": "https://github.com/WuLiFang/cgtwq/archive/2.1.1.tar.gz"
         },
         "chardet": {
             "hashes": [
