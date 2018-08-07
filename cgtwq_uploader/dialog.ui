@@ -191,11 +191,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditNote">
-       <property name="placeholderText">
-        <string>default_note_text</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lineEditNote"/>
      </item>
     </layout>
    </item>

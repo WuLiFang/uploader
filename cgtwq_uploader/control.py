@@ -271,13 +271,17 @@ class Controller(QObject):
             copy(i.src, i.dst)
             entry = CGTWQHelper.get_entry(PurePath(i.src).name, i.pipeline)
             assert isinstance(entry, cgtwq.Entry)
-            # Submit
-            if i.is_submit:
-                entry.submit([i.dst], [i.dst], note=i.submit_note)
+
+            message = cgtwq.Message(i.submit_note)
             # Set image
             mime, _ = mimetypes.guess_type(i.dst)
-            if mime and mime.startswith('image'):
-                entry.set_image(i.dst)
+            is_image = mime and mime.startswith('image')
+            if is_image:
+                image = entry.set_image(i.dst)
+                message.images.append(image)
+            # Submit
+            if i.is_submit:
+                entry.flow.submit([i.dst], message=message)
             return i.label
 
         pool = Pool()

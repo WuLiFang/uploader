@@ -19,7 +19,6 @@ from .util import CONFIG
 class Dialog(DialogWithDir):
     """Main GUI dialog.  """
 
-    default_note = '自上传工具提交'
     instance = None
     upload_finished = Signal()
     icons = {
@@ -35,7 +34,6 @@ class Dialog(DialogWithDir):
         DialogWithDir.__init__(self, config=CONFIG, parent=parent)
         self.is_uploading = False
         self.version_label.setText('v{}'.format(__version__))
-        self.lineEditNote.setPlaceholderText(self.default_note)
 
         # Set controller
         self.controller = Controller(self)
@@ -51,12 +49,7 @@ class Dialog(DialogWithDir):
             lambda index: self.on_pipeline_changed(self.comboBoxPipeline.itemText(index)))
 
         self.actionDir.triggered.connect(self.ask_dir)
-        self.actionSync.triggered.connect(
-            lambda: self.controller.upload(
-                self.checkBoxSubmit.checkState(),
-                self.lineEditNote.text()
-            )
-        )
+        self.actionSync.triggered.connect(self.on_action_sync)
         self.actionSelectAll.triggered.connect(
             self.controller.select_all)
         self.actionReverseSelection.triggered.connect(
@@ -74,6 +67,12 @@ class Dialog(DialogWithDir):
         # Recover state.
         self.controller.pipeline = CONFIG['PIPELINE']
         self.controller.change_root(self.directory)
+
+    def on_action_sync(self):
+        self.controller.upload(
+            self.checkBoxSubmit.checkState(),
+            self.lineEditNote.text())
+        self.lineEditNote.clear()
 
     def _edits_key(self):
         return {
