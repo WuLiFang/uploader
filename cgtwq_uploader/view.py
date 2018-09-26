@@ -93,10 +93,13 @@ class Dialog(DialogWithDir):
         self.listView.setRootIndex(self.controller.source_index(value))
 
     def on_view_item_clicked(self, index):
-        self.controller.change_root(index)
+        pass
 
     def on_view_item_double_clicked(self, index):
-        self.controller.open_index(index, self.checkBoxBurnIn.checkState())
+        if self.controller.model.is_dir(index):
+            self.controller.change_root(index)
+        else:
+            self.controller.open_index(index, self.checkBoxBurnIn.checkState())
 
     def on_pipeline_changed(self, pipeline):
         self.controller.change_pipeline(pipeline)
