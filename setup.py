@@ -14,13 +14,14 @@ setup(
     packages=find_packages(),
     package_data={'': ['*.ui']},
     install_requires=[
-        'wlf~=0.4',
-        'cgtwq~=2.4',
+        'wlf~=0.5',
+        'cgtwq~=3.0',
+        'Qt.py~=1.1'
     ],
     dependency_links=[
-        ('https://github.com/WuLiFang/wlf/archive/0.4.1.tar.gz'
-         '#egg=wlf-0.4.1'),
-        ('https://github.com/WuLiFang/cgtwq/archive/2.4.0.tar.gz'
-         '#egg=cgtwq-2.4.0'),
+        ('https://github.com/WuLiFang/wlf/archive/0.5.0.tar.gz'
+         '#egg=wlf-0.5.0'),
+        ('https://github.com/WuLiFang/cgtwq/archive/3.0.0-alpha.0.tar.gz'
+         '#egg=cgtwq-3.0.0-alpha.0'),
     ],
 )

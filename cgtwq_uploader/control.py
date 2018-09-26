@@ -16,13 +16,12 @@ from six.moves import range
 
 import cgtwq
 from cgtwq.helper.qt import ask_login
-from cgtwq.helper.wlf import CGTWQHelper
+from cgtwq.helper.wlf import CGTWQHelper, DatabaseError
 from wlf.env import has_nuke
 from wlf.fileutil import copy, is_same
 from wlf.path import PurePath
 from wlf.progress import CancelledError, progress
 
-from .exceptions import DatabaseError
 from .model import (ROLE_CHECKABLE, ROLE_DEST, DirectoryModel,
                     VersionFilterProxyModel)
 from .util import LOGGER
@@ -125,7 +124,7 @@ class Controller(QObject):
 
     def _ask_login(self):
         account_info = ask_login(self.default_widget)
-        cgtwq.server.setting.DEFAULT_TOKEN = account_info.token
+        cgtwq.core.CONFIG['DEFAULT_TOKEN'] = account_info.token
         return account_info
 
     def update_model(self):
@@ -144,14 +143,14 @@ class Controller(QObject):
     def _update_model(self):
         model = self.model
         root_index = model.root_index()
-        if cgtwq.DesktopClient.is_logged_in():
-            cgtwq.update_setting()
-            current_id = cgtwq.current_account_id()
-        elif not cgtwq.server.setting.DEFAULT_TOKEN:
+        client = cgtwq.DesktopClient()
+        if client.is_logged_in():
+            client.connect()
+
+        if not cgtwq.core.CONFIG['DEFAULT_TOKEN']:
             current_id = self._ask_login().account_id
         else:
-            current_id = cgtwq.get_account_id(
-                cgtwq.server.setting.DEFAULT_TOKEN)
+            current_id = cgtwq.get_account_id()
 
         def _do(i):
             index = model.index(i, 0, root_index)
