@@ -66,6 +66,7 @@ class Controller(QObject):
         proxy_model.setSourceModel(model)
         self.model = proxy_model
         self.is_updating = False
+        self.current_id = None
 
         self.model.layoutChanged.connect(self.update_model)
         self.upload_finished.connect(self.update_model)
@@ -141,8 +142,21 @@ class Controller(QObject):
             self.is_updating = False
 
     def _update_model(self):
-        model = self.model
-        root_index = model.root_index()
+        self._update_current_id()
+
+        pool = Pool()
+        count = self.model.rowCount(self.model.root_index())
+        try:
+            for _ in progress(
+                    pool.imap_unordered(self._update_model_item, range(count)),
+                    name='访问数据库',
+                    total=count,
+                    parent=self.parent()):
+                pass
+        except CancelledError:
+            LOGGER.info('用户取消')
+
+    def _update_current_id(self):
         client = cgtwq.DesktopClient()
         if client.is_logged_in():
             client.connect()
@@ -152,115 +166,107 @@ class Controller(QObject):
         else:
             current_id = cgtwq.get_account_id()
 
-        def _do(i):
-            index = model.index(i, 0, root_index)
-            if self.model.is_dir(index):
-                model.setData(index, False, ROLE_CHECKABLE)
-                model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
-                return
-            data = model.data(index)
-            filename = self.model.absolute_path(data)
+        self.current_id = current_id
 
-            def _on_error(reason):
-                model.setData(index, reason, Qt.StatusTipRole)
+    def _update_model_item(self, i):
+        model = self.model
+        root_index = model.root_index()
+        index = model.index(i, 0, root_index)
+        if model.is_dir(index):
+            model.setData(index, False, ROLE_CHECKABLE)
+            model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
+            return
+        data = model.data(index)
+        filename = model.absolute_path(data)
+
+        def _on_error(reason):
+            model.setData(index, reason, Qt.StatusTipRole)
+            model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
+            model.setData(index,
+                          self.brushes['error'],
+                          Qt.ForegroundRole)
+
+        try:
+            try:
+                entry = CGTWQHelper.get_entry(data, self.pipeline)
+            except DatabaseError:
+                _on_error('找不到对应数据库')
+                return
+            except ValueError as ex:
+                if ex.args[0] == 'Empty selection.':
+                    _on_error('找不到对应任务')
+                    return
+                raise
+            assert isinstance(entry, cgtwq.Entry), type(entry)
+            shot = PurePath(data).shot
+            dest = (model.data(index, ROLE_DEST)
+                    or (PurePath(entry.filebox.get_submit().path) /
+                        PurePath(shot).with_suffix(PurePath(data).suffix)).as_posix())
+
+            # Set dest.
+            model.setData(index, dest, ROLE_DEST)
+
+            # Set tooltip.
+            model.setData(index,
+                          '<br>'.join([
+                              '数据库: {0}'.format(
+                                  entry.module.database.name),
+                              '镜头: {0}'.format(shot),
+                              '目的地: {0}'.format(dest)
+                          ]),
+                          Qt.ToolTipRole)
+
+            # Set statustip.
+            is_ok = False
+            is_warning = False
+            is_uploaded = is_same(filename, dest)
+            account_id = entry['account_id']
+            if not account_id:
+                is_ok = True
+                is_warning = True
+                model.setData(
+                    index,
+                    '*注意*: 此任务尚未分配',
+                    Qt.StatusTipRole)
+            elif self.current_id in account_id.split(','):
+                is_ok = True
+                model.setData(
+                    index, '已上传' if is_uploaded else '等待上传', Qt.StatusTipRole)
+            else:
+                assigned = entry['artist']
+                _on_error(
+                    '此任务已分配给:{0}'.format(assigned)
+                    if assigned else '任务未分配'
+                )
+
+            # Set check state.
+            model.setData(index, is_ok, ROLE_CHECKABLE)
+            if not is_ok or is_uploaded:
                 model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
+
+            # Set color.
+            if is_uploaded:
+                model.setData(index,
+                              self.brushes['uploaded'],
+                              Qt.ForegroundRole)
+            elif is_warning:
+                model.setData(index,
+                              self.brushes['warning'],
+                              Qt.ForegroundRole)
+            elif is_ok:
+                model.setData(index,
+                              self.brushes['local'],
+                              Qt.ForegroundRole)
+            else:
                 model.setData(index,
                               self.brushes['error'],
                               Qt.ForegroundRole)
 
-            try:
-                try:
-                    entry = CGTWQHelper.get_entry(data, self.pipeline)
-                except DatabaseError:
-                    _on_error('找不到对应数据库')
-                    return
-                except ValueError as ex:
-                    if ex.args[0] == 'Empty selection.':
-                        _on_error('找不到对应任务')
-                        return
-                    raise
-                assert isinstance(entry, cgtwq.Entry), type(entry)
-                shot = PurePath(data).shot
-                dest = (model.data(index, ROLE_DEST)
-                        or (PurePath(entry.filebox.get_submit().path) /
-                            PurePath(shot).with_suffix(PurePath(data).suffix)).as_posix())
-
-                # Set dest.
-                model.setData(index, dest, ROLE_DEST)
-
-                # Set tooltip.
-                model.setData(index,
-                              '<br>'.join([
-                                  '数据库: {0}'.format(
-                                      entry.module.database.name),
-                                  '镜头: {0}'.format(shot),
-                                  '目的地: {0}'.format(dest)
-                              ]),
-                              Qt.ToolTipRole)
-
-                # Set statustip.
-                is_ok = False
-                is_warning = False
-                is_uploaded = is_same(filename, dest)
-                account_id = entry['account_id']
-                if not account_id:
-                    is_ok = True
-                    is_warning = True
-                    model.setData(
-                        index,
-                        '*注意*: 此任务尚未分配',
-                        Qt.StatusTipRole)
-                elif current_id in account_id.split(','):
-                    is_ok = True
-                    model.setData(
-                        index, '已上传' if is_uploaded else '等待上传', Qt.StatusTipRole)
-                else:
-                    assigned = entry['artist']
-                    _on_error(
-                        '此任务已分配给:{0}'.format(assigned)
-                        if assigned else '任务未分配'
-                    )
-
-                # Set check state.
-                model.setData(index, is_ok, ROLE_CHECKABLE)
-                if not is_ok or is_uploaded:
-                    model.setData(index, Qt.Unchecked, Qt.CheckStateRole)
-
-                # Set color.
-                if is_uploaded:
-                    model.setData(index,
-                                  self.brushes['uploaded'],
-                                  Qt.ForegroundRole)
-                elif is_warning:
-                    model.setData(index,
-                                  self.brushes['warning'],
-                                  Qt.ForegroundRole)
-                elif is_ok:
-                    model.setData(index,
-                                  self.brushes['local'],
-                                  Qt.ForegroundRole)
-                else:
-                    model.setData(index,
-                                  self.brushes['error'],
-                                  Qt.ForegroundRole)
-
-                return data
-            except:  # pylint: disable=bare-except
-                logging.error(
-                    'Unexpected error during access database.', exc_info=True)
-                return '<出错>'
-
-        pool = Pool()
-        count = model.rowCount(model.root_index())
-        try:
-            for _ in progress(
-                    pool.imap_unordered(_do, range(count)),
-                    name='访问数据库',
-                    total=count,
-                    parent=self.parent()):
-                pass
-        except CancelledError:
-            LOGGER.info('用户取消')
+            return data
+        except:  # pylint: disable=bare-except
+            logging.error(
+                'Unexpected error during access database.', exc_info=True)
+            return '<出错>'
 
     def upload(self, is_submit=True, submit_note=''):
         """Upload videos to server.  """
