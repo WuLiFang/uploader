@@ -1,12 +1,11 @@
 """Python setup script.  """
 import os
+import runpy
 
 from setuptools import find_packages, setup
 
-__about__ = {}
-with open(os.path.join(os.path.dirname(__file__),
-                       'cgtwq_uploader', '__about__.py')) as f:
-    exec(f.read(), __about__)  # pylint: disable=exec-used
+__about__ = runpy.run_path(
+    os.path.join(os.path.dirname(__file__), 'cgtwq_uploader', '__about__.py'))
 
 setup(
     name='cgtwq_uploader',
@@ -15,8 +14,8 @@ setup(
     packages=find_packages(),
     package_data={'': ['*.ui']},
     install_requires=[
-        'wlf @ git+https://github.com/WuLiFang/wlf@0.5.3',
-        'cgtwq @ git+https://github.com/WuLiFang/cgtwq@3.0.0-alpha.8',
+        'wlf @ https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz',
+        'cgtwq @ https://github.com/WuLiFang/cgtwq/archive/3.0.0-alpha.8.tar.gz',
         'Qt.py~=1.1'
     ],
 )

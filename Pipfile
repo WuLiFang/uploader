@@ -14,8 +14,8 @@ PySide = "*"
 requests = "~=2.18"
 websocket-client = "~=0.47"
 "Qt.py" = "~=1.1.0"
-wlf = {git = "https://github.com/WuLiFang/wlf",ref = "0.5.3"}
-cgtwq = {git = "https://github.com/WuLiFang/cgtwq",ref = "3.0.0-alpha.8"}
+wlf = {file = "https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz"}
+cgtwq = {file = "https://github.com/WuLiFang/cgtwq/archive/3.0.0-alpha.8.tar.gz"}
 
 [requires]
-python_version = "2.7"
+python_full_version = "2.7.12"
