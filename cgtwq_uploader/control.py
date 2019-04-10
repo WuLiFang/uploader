@@ -19,6 +19,7 @@ from cgtwq.helper.qt import ask_login
 from cgtwq.helper.wlf import CGTWQHelper, DatabaseError
 from wlf.env import has_nuke
 from wlf.fileutil import copy, is_same
+from wlf.mimetools import is_mimetype
 from wlf.path import PurePath
 from wlf.progress import CancelledError, progress
 
@@ -58,6 +59,12 @@ class Controller(QObject):
                    'uploaded': QBrush(Qt.gray),
                    'error': QBrush(Qt.red),
                    'warning': QBrush(QColor(200, 100, 50))}
+    pipeline_filetypes = {
+        '灯光': 'image',
+        '渲染': 'video',
+        '合成': 'image',
+        '输出': 'video'
+    }
 
     def __init__(self, parent=None):
         super(Controller, self).__init__(parent)
@@ -202,6 +209,11 @@ class Controller(QObject):
             dest = (model.data(index, ROLE_DEST)
                     or (PurePath(entry.filebox.get_submit().path) /
                         PurePath(shot).with_suffix(PurePath(data).suffix)).as_posix())
+            # Check mimetype
+            limited_filetype = self.pipeline_filetypes.get(self.pipeline)
+            if limited_filetype and not is_mimetype(data, limited_filetype):
+                _on_error('此文件类型不是 {0}'.format(limited_filetype))
+                return
 
             # Set dest.
             model.setData(index, dest, ROLE_DEST)
