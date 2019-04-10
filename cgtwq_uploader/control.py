@@ -247,7 +247,7 @@ class Controller(QObject):
                 return data
             except:  # pylint: disable=bare-except
                 logging.error(
-                    'Unexpect error during access database.', exc_info=True)
+                    'Unexpected error during access database.', exc_info=True)
                 return '<出错>'
 
         pool = Pool()
