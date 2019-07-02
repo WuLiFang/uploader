@@ -1,0 +1,3 @@
+https://github.com/WuLiFang/cgtwq/archive/3.0.0-alpha.8.tar.gz#egg=cgtwq
+https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz#egg=wlf
+qt.py==1.1.0
