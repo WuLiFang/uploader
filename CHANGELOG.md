@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://git.wlf.com/WuLiFang/uploader/compare/v3.4.0...v3.5.0) (2020-03-17)
+
+
+### Features
+
+* add more pipelines ([1740e83](https://git.wlf.com/WuLiFang/uploader/commit/1740e83))
+
 ## 3.4.0 (2019-04-10)
 
 ### Features
