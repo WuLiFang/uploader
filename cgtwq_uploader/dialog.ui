@@ -61,6 +61,36 @@
          <string>输出</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>场景细化</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>绘景</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>手绘特效</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>监修</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>数码作画</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>预合成</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

@@ -65,6 +65,14 @@ class Controller(QObject):
         '合成': 'image',
         '输出': 'video'
     }
+    pipeline_ext = {
+        '场景细化': ('.ma', '.mb', '.jpg', '.png'),
+        '绘景': ('.psd', '.png', '.tif', '.tga', '.jpg', 'exr'),
+        '监修': ('.psg', '.ma', '.mb', '.jpg', '.png'),
+        '数码作画': ('.tga', '.exr', '.png', '.tif', '.jpg', '.nk'),
+        '手绘特效': ('.jpg', '.png', '.psd', '.mov', '.mp4', '.gif'),
+        '预合成': ('.nk', '.mov', '.mp4')
+    }
 
     def __init__(self, parent=None):
         super(Controller, self).__init__(parent)
@@ -205,10 +213,18 @@ class Controller(QObject):
                     return
                 raise
             assert isinstance(entry, cgtwq.Entry), type(entry)
+            ext = PurePath(data).suffix.lower()
+
+            # Check extionsion
+            limited_ext = self.pipeline_ext.get(self.pipeline)
+            if limited_ext and not ext in limited_ext:
+                _on_error('此文件扩展名不是 {0}'.format(limited_ext))
+                return
+
             shot = PurePath(data).shot
             dest = (model.data(index, ROLE_DEST)
                     or (PurePath(entry.filebox.get_submit().path) /
-                        PurePath(shot).with_suffix(PurePath(data).suffix)).as_posix())
+                        PurePath(shot).with_suffix(ext)).as_posix())
             # Check mimetype
             limited_filetype = self.pipeline_filetypes.get(self.pipeline)
             if limited_filetype and not is_mimetype(data, limited_filetype):
