@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/WuLiFang/uploader/compare/v3.5.0...v3.6.0) (2020-06-24)
+
+
+### Features
+
+* use cgtwq.helper.wlf.get_entry_by_file ([12d7a8e](https://github.com/WuLiFang/uploader/commit/12d7a8e22200f6feb96506505190017e99ec0e4b))
+
 ## [3.5.0](https://git.wlf.com/WuLiFang/uploader/compare/v3.4.0...v3.5.0) (2020-03-17)
 
 
