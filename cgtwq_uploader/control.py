@@ -16,7 +16,7 @@ from six.moves import range
 
 import cgtwq
 from cgtwq.helper.qt import ask_login
-from cgtwq.helper.wlf import CGTWQHelper, DatabaseError
+from cgtwq.helper.wlf import DatabaseError, get_entry_by_file
 from wlf.env import has_nuke
 from wlf.fileutil import copy, is_same
 from wlf.mimetools import is_mimetype
@@ -203,7 +203,7 @@ class Controller(QObject):
 
         try:
             try:
-                entry = CGTWQHelper.get_entry(data, self.pipeline)
+                entry = get_entry_by_file(data, self.pipeline)
             except DatabaseError:
                 _on_error('找不到对应数据库')
                 return
@@ -302,7 +302,7 @@ class Controller(QObject):
         def _do(i):
             assert isinstance(i, UploadTask)
             copy(i.src, i.dst)
-            entry = CGTWQHelper.get_entry(PurePath(i.src).name, i.pipeline)
+            entry = get_entry_by_file(PurePath(i.src).name, i.pipeline)
             assert isinstance(entry, cgtwq.Entry)
 
             message = cgtwq.Message(i.submit_note)
