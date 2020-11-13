@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.3](https://github.com/WuLiFang/uploader/compare/v3.6.2...v3.6.3) (2020-11-13)
+
+
+### Bug Fixes
+
+* **deps:** wrong tags ([e2c9714](https://github.com/WuLiFang/uploader/commit/e2c97140fd6e4a856c2e34ac3d2cf4da06fb93b7))
+
 ### [3.6.2](https://github.com/WuLiFang/uploader/compare/v3.6.1...v3.6.2) (2020-11-13)
 
 ### [3.6.1](https://github.com/WuLiFang/uploader/compare/v3.6.0...v3.6.1) (2020-11-13)
