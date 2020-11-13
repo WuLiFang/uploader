@@ -6,8 +6,8 @@ authors = ["NateScarlet <NateScarlet@Gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^2.7"
-cgtwq = { git = "https://github.com/WuLiFang/cgtwq", tag = "v3.0.0-beta.2" }
-wlf = { git = "https://github.com/WuLiFang/wlf", tag = "v0.6.0" }
+cgtwq = { url = "https://github.com/WuLiFang/cgtwq/archive/v3.0.0-beta.3.tar.gz" }
+wlf = { url = "https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz" }
 "Qt.py" = "~1.1"
 
 [tool.poetry.dev-dependencies]
