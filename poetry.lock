@@ -8,22 +8,26 @@ python-versions = "*"
 
 [[package]]
 name = "cgtwq"
-version = "3.0.0-beta.3"
+version = "3.0.0-beta.4"
 description = "CGTeamWork python client for humans."
 category = "main"
 optional = false
 python-versions = "^2.7 || ^3.6"
+develop = false
 
 [package.dependencies]
-environs = ">=4.2.0,<4.3.0"
-"Qt.py" = ">=1.1,<2.0"
-requests = ">=2.19,<3.0"
-websocket-client = ">=0.47,<1.0"
-wlf = "0.6.0"
+environs = "~=4.2.0"
+"Qt.py" = "~=1.1"
+requests = "~=2.19"
+websocket-client = "~=0.47"
+wlf = "tag v0.6.0"
 
 [package.source]
-type = "url"
-url = "https://github.com/WuLiFang/cgtwq/archive/v3.0.0-beta.3.tar.gz"
+type = "git"
+url = "https://github.com/WuLiFang/cgtwq"
+reference = "v3.0.0-beta.4"
+resolved_reference = "c7c764af31ac5253536a6b88b5ad0c6aa0ab1434"
+
 [[package]]
 name = "chardet"
 version = "3.0.4"
@@ -191,6 +195,7 @@ description = ""
 category = "main"
 optional = false
 python-versions = "*"
+develop = false
 
 [package.dependencies]
 pathlib2 = {version = ">=2.3.0,<2.4.0", markers = "python_version < \"3\""}
@@ -198,12 +203,15 @@ psutil = ">=5.4.3,<5.5.0"
 "qt.py" = ">=1.1.0,<1.2.0"
 
 [package.source]
-type = "url"
-url = "https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz"
+type = "git"
+url = "https://github.com/WuLiFang/wlf"
+reference = "v0.6.0"
+resolved_reference = "d19d9f31b0c8321cc83a6c091065adf42674db91"
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^2.7"
-content-hash = "14572a3bc235ff6a7cc1bbd4ddd822049fd46751fa62dcf22a11f9d9eb982c89"
+content-hash = "22b0e33ed74e85af7ce0cf26b43aa6d6d2d71fae81ab5e337a991fbb69bda8f0"
 
 [metadata.files]
 certifi = [
