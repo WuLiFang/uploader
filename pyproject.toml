@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgtwq_uploader"
-version = "3.6.0"
+version = "3.6.1"
 description = "Uploader application for CGTeamwork."
 authors = ["NateScarlet <NateScarlet@Gmail.com>"]
 
