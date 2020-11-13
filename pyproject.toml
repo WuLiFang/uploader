@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "cgtwq_uploader"
-version = "3.6.1"
+version = "3.6.2"
 description = "Uploader application for CGTeamwork."
 authors = ["NateScarlet <NateScarlet@Gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^2.7"
-cgtwq = { url = "https://github.com/WuLiFang/cgtwq/archive/v3.0.0-beta.3.tar.gz" }
-wlf = { url = "https://github.com/WuLiFang/wlf/archive/v0.6.0.tar.gz" }
+wlf = { git = "https://github.com/WuLiFang/wlf", tag = "v0.6.0" }
+cgtwq = { git = "https://github.com/WuLiFang/cgtwq", tag = "v3.0.0.beta-4" }
 "Qt.py" = "~1.1"
 
 [tool.poetry.dev-dependencies]
