@@ -1,5 +1,5 @@
 # -*- coding=UTF-8 -*-
 """CGTeamwork batch uploader.   """
 
-__version__ = '3.6.0'
+from __version__ import VERSION as __version__
 __author__ = 'NateScarlet@Gmail.com'

@@ -19,7 +19,7 @@ module.exports = {
   userUrlFormat: `https://github.com//{{user}}`,
   bumpFiles: [
     {
-      filename: "cgtwq/__version__.py",
+      filename: "cgtwq_uploader/__version__.py",
       updater: "scripts/python-version-updater.js",
     },
     {
