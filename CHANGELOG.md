@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.4](https://github.com/WuLiFang/uploader/compare/v3.6.3...v3.6.4) (2021-09-24)
+
 ### [3.6.3](https://github.com/WuLiFang/uploader/compare/v3.6.2...v3.6.3) (2020-11-13)
 
 
