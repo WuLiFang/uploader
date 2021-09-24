@@ -17,4 +17,14 @@ module.exports = {
   compareUrlFormat: `${URL}/compare/{{previousTag}}...{{currentTag}}`,
   issueUrlFormat: `${URL}/issues/{{id}}`,
   userUrlFormat: `https://github.com//{{user}}`,
+  bumpFiles: [
+    {
+      filename: "cgtwq/__version__.py",
+      updater: "scripts/python-version-updater.js",
+    },
+    {
+      filename: "VERSION",
+      type: "plain-text",
+    },
+  ],
 };
